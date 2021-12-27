@@ -1,0 +1,68 @@
+.flex-container > div {
+  flex: 50%;
+  background-color: #f1f1f1;
+  margin: 10px;
+  margin-left: 0;
+  padding: 20px;
+  font-size: 30px;
+}
+
+/* .flex-container p {
+  padding: 5px;
+} */
+
+.diem-container {
+  /* padding: 0 40px 0 0; */
+  flex: 40%;
+}
+
+.tongdiem-container {
+  padding: 30px;
+  border: 1px solid;
+  border-radius: 4px;
+  margin-right: 30px;
+}
+
+.tongdiem-container > h5 {
+  margin: 0;
+  padding: 0;
+}
+
+.tongdiem-container > div {
+  text-align: center;
+  font-size: 40px;
+  padding-top: 30px;
+}
+
+/* .title-nguyenvong {
+  font-size: 30px;
+} */
+
+.nguyenvong-container {
+  padding: 10px;
+}
+
+.space {
+  padding: 5px;
+}
+
+.title {
+  font-size: 30px;
+  border-bottom: 1px solid;
+  width: 400px;
+  margin-bottom: 5px;
+}
+
+.title-diem {
+  font-size: 30px;
+  border-bottom: 1px solid;
+  width: 100px;
+  margin-bottom: 5px;
+}
+
+.title-2 {
+  font-size: 30px;
+  border-bottom: 1px solid;
+  width: 250px;
+  margin-bottom: 5px;
+}

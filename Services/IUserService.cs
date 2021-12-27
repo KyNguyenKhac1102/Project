@@ -11,9 +11,10 @@ namespace Project.Services
     {
         // users create update delete
         Task<IEnumerable<User>> GetUsers(CancellationToken cancellationToken);
+        Task<User> GetUserById(int id);
         Task<User> GetUserByPhone(string phone);
         Task<User> Create(RegisterDtos dto);
-        Task<bool> Update(int id, RegisterDtos dto);
+        Task<bool> Update(int id, UserUpdateDtos dto);
         Task<bool> Delete(int id);
     }
 }

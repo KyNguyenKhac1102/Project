@@ -10,6 +10,7 @@ public interface IStudentInfoRepository
 {
     // GetAll Insert, Update, Delete
     Task<IEnumerable<StudentInfo>> GetAll();
+    Task<StudentInfo> GetInfoById(int id);
     Task<StudentInfo> Insert(StudentInfoDtos dto);
 
     Task<StudentInfo> Update(int id, StudentInfoDtos dto);

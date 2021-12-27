@@ -25,6 +25,14 @@ namespace Project.Controllers
             return Ok(truongs);
         }
 
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var truong = await _truongService.GetTruongById(id);
+            return Ok(truong);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(TruongDtos dto)
         {
@@ -44,7 +52,7 @@ namespace Project.Controllers
             }
 
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, TruongDtos dto)
         {
             if (!ModelState.IsValid)

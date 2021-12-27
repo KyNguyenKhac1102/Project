@@ -10,6 +10,7 @@ public interface ITruongRepository
 {
     // GetAll Insert, Update, Delete
     Task<IEnumerable<Truong>> GetAll();
+    Task<Truong> GetTruongById(int id);
     Task<Truong> Insert(TruongDtos dto);
 
     Task<Truong> Update(int id, TruongDtos dto);

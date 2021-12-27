@@ -5,19 +5,19 @@ import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
-import { Formik, Form, FieldArray, FastField } from "formik";
+import { Formik, Form, FieldArray, FastField, Field } from "formik";
 import * as yup from "yup";
 import React, { useEffect, useState } from "react";
-import TextfieldWrapper from "../../../components/FormsUI/Textfield";
-import SelectWrapper from "../../../components/FormsUI/Select";
+
 import gender from "../../../data/gender.json";
 import doiTuongUuTien from "../../../data/doiTuongUuTien.json";
 import khuVucUuTien from "../../../data/khuVucUuTien.json";
 import maChuyenNganh from "../../../data/maChuyenNganh.json";
 import toHop from "../../../data/toHop.json";
+import tinhData from "../../../data/tinh.json";
 
 import DateTimePicker from "../../../components/FormsUI/DateTimePicker";
-import MyDropzone from "../../../components/FormsUI/MyDropzone";
+
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Alert,
@@ -26,6 +26,7 @@ import {
   CircularProgress,
   Input,
   Paper,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -39,59 +40,61 @@ import CustomSelect from "../../../components/FormsUI/CustomSelect";
 import CustomAC from "../../../components/FormsUI/CustomAutoComplete";
 
 import axios from "axios";
+import CustomSelectTruong from "../../../components/FormsUI/CusomSelectTruong/CustomSelectTruong";
+import "./UserInfo.css";
 
 const INIT_FORM_STATE = {
-  userId: 4,
-  hoTen: "",
+  userId: 5,
+  hoTen: "Nguyễn Văn A",
   ngaySinh: "",
   gioiTinh: "Nam",
 
-  SoDienThoai: "",
-  SoCCCD: "",
-  email: "",
-  diaChiHoKhau: "",
-  KhuVucId: "",
-  DoiTuongId: "",
+  SoDienThoai: "09841221412",
+  SoCCCD: "0011232421412",
+  email: "kynguyenkhac28@gmail.com",
+  diaChiHoKhau: "38 Tương Mai, quận Hai Bà Trưng, Hà Nội",
+  MaKhuVuc: "3",
+  MaDoiTuong: "00",
 
   Tinh10Id: "1",
-  TruongLop10Id: "1",
+  TruongLop10Id: "",
 
   Tinh11Id: "1",
-  TruongLop11Id: "1",
+  TruongLop11Id: "",
 
   Tinh12Id: "1",
-  TruongLop12Id: "1",
+  TruongLop12Id: "",
 
-  diaChiLienHe: "",
+  diaChiLienHe: "38 Tương Mai, quận Hai Bà Trưng, Hà Nội",
 
-  hoTenBo: "",
-  SdtBo: "",
+  hoTenBo: "Nguyễn Văn B",
+  SdtBo: "0951531531",
 
-  hoTenMe: "",
-  SdtMe: "",
+  hoTenMe: "Vũ Văn C",
+  SdtMe: "09512531531",
 
   Hocba10_url: "",
   Hocba11_url: "",
   Hocba12_url: "",
 
-  nguyenVong: [
+  nguyenVongs: [
     {
-      maChuyenNganh: "",
-      toHop: "",
+      maNganh: "",
+      maToHop: "",
     },
   ],
 
-  DiemToan10: "",
-  DiemLy10: "",
-  DiemHoa10: "",
+  DiemToan10: "1",
+  DiemLy10: "1",
+  DiemHoa10: "1",
 
-  DiemToan11: "",
-  DiemLy11: "",
-  DiemHoa11: "",
+  DiemToan11: "1",
+  DiemLy11: "1",
+  DiemHoa11: "1",
 
-  DiemToan12: "",
-  DiemLy12: "",
-  DiemHoa12: "",
+  DiemToan12: "1",
+  DiemLy12: "1",
+  DiemHoa12: "1",
 };
 
 const FORM_VALIDATION = yup.object().shape({
@@ -111,14 +114,15 @@ const FORM_VALIDATION = yup.object().shape({
     .required("Vui lòng nhập CCCD/CMND"),
   email: yup
     .string()
+
     .email("Vui lòng nhập đúng định dạng Email")
     .required("Vui lòng nhập Email"),
   diaChiHoKhau: yup
     .string()
     .required("Vui lòng nhập địa chỉ hộ khẩu thường trú"),
 
-  KhuVucId: yup.string().required("Vui lòng chọn khu vực"),
-  DoiTuongId: yup.string().required("Vui lòng nhập đối tượng thí sinh"),
+  MaKhuVuc: yup.string().required("Vui lòng chọn khu vực"),
+  MaDoiTuong: yup.string().required("Vui lòng nhập đối tượng thí sinh"),
 
   Tinh10Id: yup.string().required("Vui lòng chọn tỉnh lớp 10").nullable(),
   TruongLop10Id: yup.string().required("Vui lòng chọn trường lớp 10"),
@@ -205,8 +209,12 @@ export default function UserInfo() {
   const [files, setFiles] = useState([]);
   const [truongData, setTruongData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [sucess, setSucess] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [fail, setFail] = useState(false);
+  const [failEmail, setFailEmail] = useState(false);
+  const [emailCheck, setEmailCheck] = useState("");
+  const [statusEmail, setStatusEmail] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleFileInputChange10 = (e) => {
     const file = e.target.files[0];
@@ -226,12 +234,56 @@ export default function UserInfo() {
     setFiles([...files, file]);
   };
 
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSuccess(false);
+  };
+
+  const handleCloseFailEmail = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setFailEmail(false);
+  };
+
+  const handleCheckEmail = (values) => {
+    console.log(values.email);
+    const options = {
+      method: "GET",
+      url: "https://email-checker.p.rapidapi.com/verify/v1",
+      params: { email: values.email },
+      headers: {
+        "x-rapidapi-host": "email-checker.p.rapidapi.com",
+        "x-rapidapi-key": "37a28856b7msh8f3b4226e807c49p13ff19jsn38e89890b7b4",
+      },
+    };
+
+    axios
+      .request(options)
+      .then(function (response) {
+        console.log("check", response);
+        //upload to server here
+        if (response.data.status === "valid") {
+          setOpen(true);
+          uploadToServer(values);
+        } else if (response.data.status === "invalid") {
+          setLoading(false);
+          setFailEmail(true);
+        }
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+  };
+
   const uploadToServer = (values) => {
     axios
       .post("/api/StudentInfo", values)
       .then((res) => {
         setLoading(false);
-        setSucess(true);
+        setSuccess(true);
         console.log("info lưu trong db", res.data);
       })
       .catch((err) => {
@@ -245,7 +297,7 @@ export default function UserInfo() {
     axios
       .get("/api/Truong")
       .then((res) => {
-        console.log("truong", res);
+        console.log("truong", res.data);
         setTruongData(res.data);
       })
       .catch((err) => {
@@ -266,8 +318,34 @@ export default function UserInfo() {
         <CircularProgress color="inherit" />
       </Backdrop>
 
-      {sucess ? <Alert severity="success">Thành công đăng ký!</Alert> : ""}
-      {fail ? <Alert severity="error">Lỗi đăng ký!</Alert> : ""}
+      <Snackbar
+        open={success}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+          Đăng ký xét tuyển thành công!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={failEmail}
+        autoHideDuration={6000}
+        onClose={handleCloseFailEmail}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseFailEmail}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Email Failed!
+        </Alert>
+      </Snackbar>
+
+      {/* {success ? <Alert severity="success">Thành công đăng ký!</Alert> : ""}
+      {fail ? <Alert severity="error">Lỗi đăng ký!</Alert> : ""} */}
 
       <Card sx={{ marginTop: "100px" }}>
         <CardContent>
@@ -276,36 +354,91 @@ export default function UserInfo() {
             validationSchema={FORM_VALIDATION}
             onSubmit={(values) => {
               setLoading(true);
-              files.map((file, index) => {
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("upload_preset", "qyheocie");
 
-                axios
-                  .post(
-                    "https://api.cloudinary.com/v1_1/k9nxk/image/upload",
-                    formData
-                  )
-                  .then((res) => {
-                    if (index === 0) values.Hocba10_url = res.data.secure_url;
-                    if (index === 1) values.Hocba11_url = res.data.secure_url;
-                    if (index === 2) values.Hocba12_url = res.data.secure_url;
-                  })
-                  .catch((err) => {
-                    console.log("cloud err", err);
-                  });
+              Promise.all(
+                files.map(async (file, index) => {
+                  let res;
+                  const formData = new FormData();
+                  formData.append("file", file);
+                  formData.append("upload_preset", "qyheocie");
+                  try {
+                    res = await axios.post(
+                      "https://api.cloudinary.com/v1_1/k9nxk/image/upload",
+                      formData
+                    );
+                    // .then((res) => {
+                    //   if (index === 0) {
+                    //     console.log("0");
+                    //     values["Hocba10_url"] = res.data.secure_url;
+                    //   } else if (index === 1) {
+                    //     console.log("1");
+                    //     values["Hocba11_url"] = res.data.secure_url;
+                    //   } else if (index === 2) {
+                    //     console.log("2");
+                    //     values["Hocba12_url"] = res.data.secure_url;
+                    //   }
+                    // });
+                  } catch (err) {
+                    return err;
+                  }
+                  if (index === 0) {
+                    console.log("0");
+                    values["Hocba10_url"] = res.data.secure_url;
+                  } else if (index === 1) {
+                    console.log("1");
+                    values["Hocba11_url"] = res.data.secure_url;
+                  } else if (index === 2) {
+                    console.log("2");
+                    values["Hocba12_url"] = res.data.secure_url;
+                  }
+                  return res;
+                })
+              ).then((results) => {
+                // All the resolved promises returned from the map function.
+                console.log("results", results);
+                // uploadToServer(values);
+                handleCheckEmail(values);
               });
 
-              console.log("values send to server", values);
+              // files.map((file, index) => {
+              //   const formData = new FormData();
+              //   formData.append("file", file);
+              //   formData.append("upload_preset", "qyheocie");
 
-              setTimeout(uploadToServer(values), 1000);
+              //   axios
+              //     .post(
+              //       "https://api.cloudinary.com/v1_1/k9nxk/image/upload",
+              //       formData
+              //     )
+              //     .then((res) => {
+              //       if (index === 0) {
+              //         console.log("0");
+              //         values["Hocba10_url"] = res.data.secure_url;
+              //       } else if (index === 1) {
+              //         console.log("1");
+              //         values["Hocba11_url"] = res.data.secure_url;
+              //       } else if (index === 2) {
+              //         console.log("2");
+              //         values["Hocba12_url"] = res.data.secure_url;
+              //       }
+              //     })
+              //     .catch((err) => {
+              //       console.log("cloud err", err);
+              //     });
+              // });
+
+              // console.log("values send to server", values);
+              // uploadToServer(values);
             }}
           >
             {({ values, isSubmitting, insert, remove, push }) => (
               <Form>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <Typography>Thông tin thí sinh</Typography>
+                    <Typography>
+                      <span className="number-part">1</span>{" "}
+                      <span className="title-part">Thông tin thí sinh</span>
+                    </Typography>
                   </Grid>
 
                   <Grid item xs={4}>
@@ -356,11 +489,14 @@ export default function UserInfo() {
                       label="Email"
                       component={CustomField}
                     />
+                    {/* {setEmailCheck(values.email)} */}
+                    {/* {setTimeout(() => setEmailCheck(values.email), 0)} */}
                     {/* <TextfieldWrapper name="email" label="Email" /> */}
                   </Grid>
+
                   <Grid item xs={4}>
                     <FastField
-                      name="DoiTuongId"
+                      name="MaDoiTuong"
                       label="Đối tượng"
                       component={CustomSelect}
                       options={doiTuongUuTien}
@@ -373,7 +509,7 @@ export default function UserInfo() {
                   </Grid>
                   <Grid item xs={4}>
                     <FastField
-                      name="KhuVucId"
+                      name="MaKhuVuc"
                       label="Khu vực"
                       component={CustomSelect}
                       options={khuVucUuTien}
@@ -397,7 +533,10 @@ export default function UserInfo() {
                   </Grid>
 
                   <Grid item xs={12}>
-                    <Typography>Thông tin trường THPT</Typography>
+                    <Typography>
+                      <span className="number-part">2</span>
+                      <span className="title-part"> Thông tin trường THPT</span>
+                    </Typography>
                   </Grid>
 
                   <Grid item xs={4}>
@@ -405,7 +544,7 @@ export default function UserInfo() {
                       name="Tinh10Id"
                       label="Mã tỉnh: tên tỉnh lớp 10"
                       component={CustomSelect}
-                      options={khuVucUuTien}
+                      options={tinhData}
                     />
                     {/* <SelectWrapper
                       name="lop10.tinh"
@@ -421,11 +560,11 @@ export default function UserInfo() {
                       label="Trường lớp 10:"
                     /> */}
 
-                    <FastField
+                    <Field
                       name="TruongLop10Id"
                       label="Trường lớp 10:"
-                      component={CustomSelect}
-                      options={khuVucUuTien}
+                      component={CustomSelectTruong}
+                      options={truongData}
                     />
                     {/* <SelectWrapper
                       name="lop10.truong"
@@ -439,7 +578,7 @@ export default function UserInfo() {
                       name="Tinh11Id"
                       label="Mã tỉnh: tên tỉnh lớp 11"
                       component={CustomSelect}
-                      options={khuVucUuTien}
+                      options={tinhData}
                     />
                     {/* <SelectWrapper
                       name="lop11.tinh"
@@ -449,11 +588,11 @@ export default function UserInfo() {
                   </Grid>
 
                   <Grid item xs={8}>
-                    <FastField
+                    <Field
                       name="TruongLop11Id"
                       label="Trường lớp 11:"
-                      component={CustomSelect}
-                      options={khuVucUuTien}
+                      component={CustomSelectTruong}
+                      options={truongData}
                     />
                     {/* <SelectWrapper
                       name="lop11.truong"
@@ -467,7 +606,7 @@ export default function UserInfo() {
                       name="Tinh12Id"
                       label="Mã tỉnh: tên tỉnh lớp 12"
                       component={CustomSelect}
-                      options={khuVucUuTien}
+                      options={tinhData}
                     />
                     {/* <SelectWrapper
                       name="lop12.tinh"
@@ -477,11 +616,11 @@ export default function UserInfo() {
                   </Grid>
 
                   <Grid item xs={8}>
-                    <FastField
+                    <Field
                       name="TruongLop12Id"
                       label="Trường lớp 12:"
-                      component={CustomSelect}
-                      options={khuVucUuTien}
+                      component={CustomSelectTruong}
+                      options={truongData}
                     />
                     {/* <SelectWrapper
                       name="lop12.truong"
@@ -491,7 +630,10 @@ export default function UserInfo() {
                   </Grid>
 
                   <Grid item xs={12}>
-                    <Typography>Thông tin liên hệ</Typography>
+                    <Typography>
+                      <span className="number-part">3</span>
+                      <span className="title-part"> Thông tin liên hệ</span>
+                    </Typography>
                   </Grid>
 
                   <Grid item xs={12}>
@@ -553,7 +695,13 @@ export default function UserInfo() {
                   </Grid>
 
                   <Grid item xs={12}>
-                    <Typography>Thông tin đăng ký xét tuyển</Typography>
+                    <Typography>
+                      <span className="number-part">4</span>
+                      <span className="title-part">
+                        {" "}
+                        Thông tin đăng ký xét tuyển
+                      </span>
+                    </Typography>
                   </Grid>
                   <Grid item xs={12}>
                     <Typography>Ảnh học bạ.</Typography>
@@ -613,15 +761,15 @@ export default function UserInfo() {
                   </TableContainer>
 
                   <Grid container item spacing={2}>
-                    <FieldArray name="nguyenVong">
+                    <FieldArray name="nguyenVongs">
                       {({ insert, push, remove }) => (
                         <>
-                          {values.nguyenVong.length > 0 &&
-                            values.nguyenVong.map((nv, index) => (
+                          {values.nguyenVongs.length > 0 &&
+                            values.nguyenVongs.map((nv, index) => (
                               <Grid container item spacing={2} key={index}>
                                 <Grid item xs={1}>
                                   <FastField
-                                    name={`nguyenVong.${index}`}
+                                    name={`nguyenVongs.${index}`}
                                     label={`Nguyện vọng`}
                                     inputProps={{
                                       style: { textAlign: "center" },
@@ -632,7 +780,7 @@ export default function UserInfo() {
                                   />
 
                                   {/* <TextfieldWrapper
-                                    name={`nguyenVong.${index}`}
+                                    name={`nguyenVongs.${index}`}
                                     label={`Nguyện vọng`}
                                     inputProps={{
                                       style: { textAlign: "center" },
@@ -643,32 +791,32 @@ export default function UserInfo() {
                                 </Grid>
                                 <Grid item xs={6}>
                                   <FastField
-                                    name={`nguyenVong.${index}.maChuyenNganh`}
+                                    name={`nguyenVongs.${index}.maNganh`}
                                     label="Ngành đăng ký"
                                     options={maChuyenNganh}
                                     component={CustomSelect}
                                   />
                                   {/* <SelectWrapper
-                                    name={`nguyenVong.${index}.maChuyenNganh`}
+                                    name={`nguyenVongs.${index}.maChuyenNganh`}
                                     label="Ngành đăng ký"
                                     options={maChuyenNganh}
                                   /> */}
                                 </Grid>
                                 <Grid item xs={2}>
                                   <FastField
-                                    name={`nguyenVong.${index}.toHop`}
+                                    name={`nguyenVongs.${index}.maToHop`}
                                     label="Tổ hợp"
                                     options={toHop}
                                     component={CustomSelect}
                                   />
                                   {/* <SelectWrapper
-                                    name={`nguyenVong.${index}.toHop`}
+                                    name={`nguyenVongs.${index}.toHop`}
                                     label="Tổ hợp"
                                     options={toHop}
                                   /> */}
                                 </Grid>
-                                {values.nguyenVong &&
-                                  values.nguyenVong.length > 1 && (
+                                {values.nguyenVongs &&
+                                  values.nguyenVongs.length > 1 && (
                                     <Grid item xs={1}>
                                       <Button
                                         color="inherit"
@@ -685,8 +833,8 @@ export default function UserInfo() {
                               variant="contained"
                               onClick={() =>
                                 push({
-                                  maChuyenNganh: "",
-                                  toHop: "",
+                                  maNganh: "",
+                                  maToHop: "",
                                 })
                               }
                             >

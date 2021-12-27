@@ -19,7 +19,12 @@ namespace Project.Repositories
         }
         public async Task<IEnumerable<StudentInfo>> GetAll()
         {
-            return await _context.StudentInfos.ToListAsync();
+            return await _context.StudentInfos.Include(s => s.StudentNguyenVongs).ToListAsync();
+        }
+
+        public async Task<StudentInfo> GetInfoById(int id)
+        {
+            return await _context.StudentInfos.Where(s => s.Id == id).Include(s => s.StudentNguyenVongs).FirstOrDefaultAsync();
         }
 
         public async Task<StudentInfo> Insert(StudentInfoDtos dto)
@@ -30,29 +35,29 @@ namespace Project.Repositories
 
             var diemCongDoiTuong = 0;
             double diemCongKhuVuc = 0;
-            if (dto.DoiTuongId == "01" || dto.DoiTuongId == "02" || dto.DoiTuongId == "03" || dto.DoiTuongId == "04")
+            if (dto.MaDoiTuong == "01" || dto.MaDoiTuong == "02" || dto.MaDoiTuong == "03" || dto.MaDoiTuong == "04")
             {
                 diemCongDoiTuong = 2;
             }
-            else if (dto.DoiTuongId == "05" || dto.DoiTuongId == "06" || dto.DoiTuongId == "07")
+            else if (dto.MaDoiTuong == "05" || dto.MaDoiTuong == "06" || dto.MaDoiTuong == "07")
             {
                 diemCongDoiTuong = 1;
             }
 
-            if (dto.KhuVucId == "1")
+            if (dto.MaKhuVuc == "1")
             {
                 diemCongKhuVuc = 0.75;
             }
-            else if (dto.KhuVucId == "2")
+            else if (dto.MaKhuVuc == "2")
             {
                 diemCongKhuVuc = 0.25;
             }
-            else if (dto.KhuVucId == "2NT")
+            else if (dto.MaKhuVuc == "2NT")
             {
                 diemCongKhuVuc = 0.5;
             }
 
-            var diem_final = Math.Round((diemtb10 + diemtb11 + diemtb12) / 3, 2) + diemCongKhuVuc + diemCongDoiTuong;
+            var diem_final = Math.Round((diemtb10 + diemtb11 + diemtb12 + diemCongKhuVuc + diemCongDoiTuong), 2);
             var studentInfo = new StudentInfo()
             {
                 HoTen = dto.HoTen,
@@ -62,8 +67,8 @@ namespace Project.Repositories
                 SoDienThoai = dto.SoDienThoai,
                 Email = dto.Email,
                 DiaChiHoKhau = dto.DiaChiHoKhau,
-                DoiTuongId = dto.DoiTuongId,
-                KhuVucId = dto.KhuVucId,
+                MaDoiTuong = dto.MaDoiTuong,
+                MaKhuVuc = dto.MaKhuVuc,
                 Tinh10Id = dto.Tinh10Id,
                 Tinh11Id = dto.Tinh11Id,
                 Tinh12Id = dto.Tinh12Id,
@@ -100,7 +105,7 @@ namespace Project.Repositories
             };
 
             await _context.StudentInfos.AddAsync(studentInfo);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return studentInfo;
         }
@@ -118,8 +123,8 @@ namespace Project.Repositories
                 studentInfo.SoDienThoai = dto.SoDienThoai;
                 studentInfo.Email = dto.Email;
                 studentInfo.DiaChiHoKhau = dto.DiaChiHoKhau;
-                studentInfo.DoiTuongId = dto.DoiTuongId;
-                studentInfo.KhuVucId = dto.KhuVucId;
+                studentInfo.MaDoiTuong = dto.MaDoiTuong;
+                studentInfo.MaKhuVuc = dto.MaKhuVuc;
                 studentInfo.Tinh10Id = dto.Tinh10Id;
                 studentInfo.Tinh11Id = dto.Tinh11Id;
                 studentInfo.Tinh12Id = dto.Tinh12Id;

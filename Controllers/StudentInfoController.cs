@@ -25,6 +25,13 @@ namespace Project.Controllers
             return Ok(studentInfos);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var studentInfo = await _studentInfoService.GetInfoById(id);
+            return Ok(studentInfo);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(StudentInfoDtos dto)
         {
@@ -33,15 +40,16 @@ namespace Project.Controllers
                 return BadRequest(ModelState);
             }
 
-
-            var studentInfo = await _studentInfoService.Create(dto);
-
-            if (studentInfo != null)
-                return Created("/api/StudentInfo", studentInfo);
-            else
+            try
             {
-                return StatusCode(StatusCodes.Status400BadRequest);
+                var studentInfo = await _studentInfoService.Create(dto);
+                return Created("/api/StudentInfo", studentInfo);
             }
+            catch (Exception)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+
 
         }
         [HttpPut]

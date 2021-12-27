@@ -33,6 +33,22 @@ namespace project.Migrations
                     b.ToTable("DoiTuongs");
                 });
 
+            modelBuilder.Entity("Project.Models.Khoa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("TenKhoa")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Khoas");
+                });
+
             modelBuilder.Entity("Project.Models.KhuVuc", b =>
                 {
                     b.Property<string>("MaKhuVuc")
@@ -49,16 +65,19 @@ namespace project.Migrations
 
             modelBuilder.Entity("Project.Models.Nganh", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("MaNganh")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("KhoaId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TenNganh")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("MaNganh");
+
+                    b.HasIndex("KhoaId");
 
                     b.ToTable("Nganhs");
                 });
@@ -137,9 +156,6 @@ namespace project.Migrations
                     b.Property<double>("DiemToan12")
                         .HasColumnType("float");
 
-                    b.Property<string>("DoiTuongId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -172,7 +188,10 @@ namespace project.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("KhuVucId")
+                    b.Property<string>("MaDoiTuong")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MaKhuVuc")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("NgaySinh")
@@ -218,13 +237,13 @@ namespace project.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DoiTuongId")
+                    b.HasIndex("MaDoiTuong")
                         .IsUnique()
-                        .HasFilter("[DoiTuongId] IS NOT NULL");
+                        .HasFilter("[MaDoiTuong] IS NOT NULL");
 
-                    b.HasIndex("KhuVucId")
+                    b.HasIndex("MaKhuVuc")
                         .IsUnique()
-                        .HasFilter("[KhuVucId] IS NOT NULL");
+                        .HasFilter("[MaKhuVuc] IS NOT NULL");
 
                     b.HasIndex("Tinh10Id")
                         .IsUnique()
@@ -260,25 +279,25 @@ namespace project.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("NganhId")
-                        .HasColumnType("int");
+                    b.Property<string>("MaNganh")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MaToHop")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("Stt_NguyenVong")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StudentInfoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToHopId")
+                    b.Property<int>("StudentInfoId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NganhId");
+                    b.HasIndex("MaNganh");
+
+                    b.HasIndex("MaToHop");
 
                     b.HasIndex("StudentInfoId");
-
-                    b.HasIndex("ToHopId");
 
                     b.ToTable("StudentNguyenVongs");
                 });
@@ -299,16 +318,14 @@ namespace project.Migrations
 
             modelBuilder.Entity("Project.Models.ToHop", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("MaToHop")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("TenToHop")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("MaToHop");
 
                     b.ToTable("ToHops");
                 });
@@ -375,15 +392,26 @@ namespace project.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Project.Models.Nganh", b =>
+                {
+                    b.HasOne("Project.Models.Khoa", "Khoa")
+                        .WithMany("Nganhs")
+                        .HasForeignKey("KhoaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Khoa");
+                });
+
             modelBuilder.Entity("Project.Models.StudentInfo", b =>
                 {
                     b.HasOne("Project.Models.DoiTuong", "DoiTuong")
                         .WithOne("StudentInfo")
-                        .HasForeignKey("Project.Models.StudentInfo", "DoiTuongId");
+                        .HasForeignKey("Project.Models.StudentInfo", "MaDoiTuong");
 
                     b.HasOne("Project.Models.KhuVuc", "KhuVuc")
                         .WithOne("StudentInfo")
-                        .HasForeignKey("Project.Models.StudentInfo", "KhuVucId");
+                        .HasForeignKey("Project.Models.StudentInfo", "MaKhuVuc");
 
                     b.HasOne("Project.Models.Tinh", "Tinh10")
                         .WithOne("Tinh10Info")
@@ -444,19 +472,16 @@ namespace project.Migrations
                 {
                     b.HasOne("Project.Models.Nganh", "Nganh")
                         .WithMany()
-                        .HasForeignKey("NganhId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MaNganh");
+
+                    b.HasOne("Project.Models.ToHop", "ToHop")
+                        .WithMany()
+                        .HasForeignKey("MaToHop");
 
                     b.HasOne("Project.Models.StudentInfo", "StudentInfo")
                         .WithMany("StudentNguyenVongs")
                         .HasForeignKey("StudentInfoId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Project.Models.ToHop", "ToHop")
-                        .WithMany()
-                        .HasForeignKey("ToHopId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Nganh");
@@ -478,6 +503,11 @@ namespace project.Migrations
             modelBuilder.Entity("Project.Models.DoiTuong", b =>
                 {
                     b.Navigation("StudentInfo");
+                });
+
+            modelBuilder.Entity("Project.Models.Khoa", b =>
+                {
+                    b.Navigation("Nganhs");
                 });
 
             modelBuilder.Entity("Project.Models.KhuVuc", b =>

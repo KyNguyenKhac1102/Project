@@ -35,6 +35,11 @@ namespace Project.Repositories
             return Enumerable.Empty<User>();
         }
 
+        public async Task<User> GetUserById(int id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
         public async Task<User> GetUserByPhone(string phone)
         {
             return await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phone);
@@ -66,7 +71,7 @@ namespace Project.Repositories
 
             }
         }
-        public async Task<bool> Update(int id, RegisterDtos dto)
+        public async Task<bool> Update(int id, UserUpdateDtos dto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 

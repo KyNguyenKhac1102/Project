@@ -24,9 +24,11 @@ namespace Project.Models
 
 
         //navigation property
-
+        [JsonIgnore]
         public StudentInfo StudentInfo { get; set; }
+
         public int? RoleId { get; set; }
+        [JsonIgnore]
         public Role Role { get; set; }
 
     }

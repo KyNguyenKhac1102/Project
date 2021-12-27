@@ -19,8 +19,8 @@ namespace Project.Models
         public string Email { get; set; }
         public string DiaChiHoKhau { get; set; }
 
-        public string DoiTuongId { get; set; }
-        public string KhuVucId { get; set; }
+        public string MaDoiTuong { get; set; }
+        public string MaKhuVuc { get; set; }
         public string Tinh10Id { get; set; }
 
         public string Tinh11Id { get; set; }
@@ -55,7 +55,7 @@ namespace Project.Models
         public double DiemLy12 { get; set; }
         public double DiemHoa12 { get; set; }
 
-        // public StudentNguyenVongDtos[] NguyenVongs { get; set; }
+        public StudentNguyenVongDtos[] NguyenVongs { get; set; }
 
         public int UserId { get; set; }
 

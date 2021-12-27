@@ -24,6 +24,11 @@ namespace Project.Repositories
             return await _context.Truongs.Take(100).ToListAsync();
         }
 
+        public async Task<Truong> GetTruongById(int id)
+        {
+            return await _context.Truongs.FirstOrDefaultAsync(truong => truong.Id == id);
+        }
+
         public async Task<Truong> Insert(TruongDtos dto)
         {
             var truong = new Truong()
@@ -48,6 +53,8 @@ namespace Project.Repositories
                 truong.MaTruong = dto.MaTruong;
                 truong.TenTruong = dto.TenTruong;
                 truong.DiaChi = dto.DiaChi;
+
+                await _context.SaveChangesAsync();
                 return truong;
             }
             catch (System.Exception)

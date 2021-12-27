@@ -89,8 +89,32 @@ namespace Project.Controllers
             return Ok(users);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] RegisterDtos dto, string code)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var user = await _userSerivce.GetUserById(id);
+            return Ok(user);
+        }
+
+        [HttpPost("private")]
+
+        public async Task<IActionResult> PrivatePost(RegisterDtos dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var user = await _userSerivce.Create(dto);
+
+            if (user == null)
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            return Created("/api/User", user);
+        }
+
+        [HttpPost("public")]
+
+        public async Task<IActionResult> PublicPost([FromBody] RegisterDtos dto, string code)
         {
             if (!ModelState.IsValid)
             {
@@ -128,8 +152,8 @@ namespace Project.Controllers
 
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Put(int id, RegisterDtos dto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, UserUpdateDtos dto)
         {
             if (!ModelState.IsValid)
             {

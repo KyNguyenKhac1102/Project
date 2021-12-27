@@ -12,7 +12,6 @@ import {
 import OtpInput from "react-otp-input";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import { height } from "@mui/system";
 
 export default function OTPVerify({ setStep, storeValue }) {
   const [otp, setOtp] = useState("");
@@ -34,7 +33,7 @@ export default function OTPVerify({ setStep, storeValue }) {
     setLoading(true);
     console.log("storeValue", storeValue);
     axios
-      .post(`/api/User?code=${otp}`, {
+      .post(`/api/User/public?code=${otp}`, {
         Name: storeValue.hoTen,
         PhoneNumber: storeValue.soDienThoai,
         Password: storeValue.matKhau,

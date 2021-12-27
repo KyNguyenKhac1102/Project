@@ -22,6 +22,11 @@ namespace Project.Services
 
         }
 
+        public async Task<User> GetUserById(int id)
+        {
+            return await _userRepo.GetUserById(id);
+        }
+
         public async Task<User> GetUserByPhone(string phone)
         {
             return await _userRepo.GetUserByPhone(phone);
@@ -38,7 +43,7 @@ namespace Project.Services
         }
 
 
-        public async Task<bool> Update(int id, RegisterDtos dto)
+        public async Task<bool> Update(int id, UserUpdateDtos dto)
         {
             if (await _userRepo.Update(id, dto))
             {

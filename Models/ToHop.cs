@@ -6,8 +6,9 @@ namespace Project.Models
 {
     public class ToHop
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string MaToHop { get; set; }
         [MaxLength(100)]
         public string TenToHop { get; set; }
 

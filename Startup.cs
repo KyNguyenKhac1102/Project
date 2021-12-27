@@ -65,10 +65,14 @@ namespace project
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITruongRepository, TruongRepository>();
             services.AddScoped<IStudentInfoRepository, StudentInfoRepository>();
+            services.AddScoped<INganhRepository, NganhRepository>();
+            services.AddScoped<IStudentNvRepository, StudentNvRepository>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITruongService, TruongService>();
             services.AddScoped<IStudentInfoService, StudentInfoService>();
+            services.AddScoped<INganhService, NganhService>();
+
             services.AddControllersWithViews();
 
 

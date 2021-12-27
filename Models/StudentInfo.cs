@@ -32,13 +32,15 @@ namespace Project.Models
         [MaxLength(100)]
         public string DiaChiHoKhau { get; set; }
 
-        public string DoiTuongId { get; set; }
-        [ForeignKey("DoiTuongId")]
+
+        [ForeignKey("DoiTuong")]
+        public string MaDoiTuong { get; set; }
         [JsonIgnore]
         public DoiTuong DoiTuong { get; set; }
 
-        public string KhuVucId { get; set; }
-        [ForeignKey("KhuVucId")]
+
+        [ForeignKey("KhuVuc")]
+        public string MaKhuVuc { get; set; }
         [JsonIgnore]
         public KhuVuc KhuVuc { get; set; }
 
@@ -50,9 +52,11 @@ namespace Project.Models
         [ForeignKey("Tinh12")]
         public string Tinh12Id { get; set; }
 
+
         [InverseProperty("Tinh10Info")]
         [JsonIgnore]
         public Tinh Tinh10 { get; set; }
+
         [InverseProperty("Tinh11Info")]
         [JsonIgnore]
         public Tinh Tinh11 { get; set; }
@@ -100,7 +104,7 @@ namespace Project.Models
         [MaxLength(200)]
         public string Hocba12_url { get; set; }
 
-        [JsonIgnore]
+
         public ICollection<StudentNguyenVong> StudentNguyenVongs { get; set; }
 
 

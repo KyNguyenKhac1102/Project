@@ -6,10 +6,14 @@ namespace Project.Models
 {
     public class Nganh
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string MaNganh { get; set; }
         [MaxLength(100)]
         public string TenNganh { get; set; }
+
+        public int KhoaId { get; set; }
+        public Khoa Khoa { get; set; }
 
 
     }

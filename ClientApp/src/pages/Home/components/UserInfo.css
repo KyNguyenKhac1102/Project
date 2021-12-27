@@ -1,0 +1,17 @@
+.title-part {
+  text-transform: uppercase;
+  font-size: x-large;
+  padding: 5px;
+  font-weight: bold;
+  color: #0065ca;
+  border-bottom: 3px solid #0065ca;
+}
+
+.number-part {
+  padding: 10px 15px;
+  font-size: x-large;
+  font-weight: bold;
+  color: white;
+  background-color: #0065ca;
+  margin-right: 3px;
+}

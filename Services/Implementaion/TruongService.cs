@@ -20,6 +20,13 @@ namespace Project.Services
             return await _truongRepo.GetAll();
 
         }
+
+        public async Task<Truong> GetTruongById(int id)
+        {
+            return await _truongRepo.GetTruongById(id);
+
+        }
+
         public async Task<Truong> Create(TruongDtos dto)
         {
             return await _truongRepo.Insert(dto);

@@ -56,7 +56,7 @@ namespace Project.Context
         public DbSet<KhuVuc> KhuVucs { get; set; }
         // public DbSet<LienHe> LienHes { get; set; }
 
-
+        public DbSet<Khoa> Khoas { get; set; }
         public DbSet<Nganh> Nganhs { get; set; }
         public DbSet<StudentInfo> StudentInfos { get; set; }
         public DbSet<StudentNguyenVong> StudentNguyenVongs { get; set; }
