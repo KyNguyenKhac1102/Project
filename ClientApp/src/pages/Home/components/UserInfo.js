@@ -256,7 +256,7 @@ export default function UserInfo() {
       params: { email: values.email },
       headers: {
         "x-rapidapi-host": "email-checker.p.rapidapi.com",
-        "x-rapidapi-key": "37a28856b7msh8f3b4226e807c49p13ff19jsn38e89890b7b4",
+        "x-rapidapi-key": "",
       },
     };
 
